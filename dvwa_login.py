@@ -2,48 +2,41 @@ import requests
 from dotenv import load_dotenv
 import os
 from bs4 import BeautifulSoup
-import sys
 
 load_dotenv()
-
-username = os.getenv(key="LOGIN_USERNAME", default="")
-password = os.getenv(key="LOGIN_PASSWORD", default="")
+URL = os.getenv(key="TEST_TARGET", default="http://192.168.157.136")
 
 
-def dvwa_login(baseURL: str):
+def dvwa_login(base_url: str):
     session = requests.Session()
 
-    # login
-    loginPage = session.get(f"{baseURL}/login.php")
-    soupLogin = BeautifulSoup(loginPage.text, "html.parser")
-    token = soupLogin.find("input", {"name": "user_token"})["value"]
+    loginPage = session.get(f"{base_url}/login.php")
+    soup = BeautifulSoup(loginPage.text, "html.parser")
+    token = soup.find("input", {"name": "user_token"})["value"]
     loginData = {
-        "username": username,
-        "password": password,
+        "username": "admin",
+        "password": "password",
         "Login": "Login",
         "user_token": token,
     }
+    session.post(f"{base_url}/login.php", data=loginData, allow_redirects=True)
 
-    session.get(f"{baseURL}/login.php", data=loginData, allow_redirects=True)
-
-    # load secuirty page and change security lvl
-    securityPage = session.get(f"{baseURL}/security.php")
+    securityPage = session.get(f"{base_url}/security.php")
     soupSecurity = BeautifulSoup(securityPage.text, "html.parser")
     tokenSecurity = soupSecurity.find("input", {"name": "user_token"})["value"]
-    secuirtyData = {
+    securityData = {
         "security": "low",
-        "seclev_submit": "submit",
+        "seclev_submit": "Submit",
         "user_token": tokenSecurity,
     }
-    session.post(f"{baseURL}/security.php", data=secuirtyData, allow_redirects=True)
+    session.post(f"{base_url}/security.php", data=securityData, allow_redirects=True)
 
-    # get cookies
     cookies = session.cookies.get_dict()
     cookieString = "; ".join(f"{k}={v}" for k, v in cookies.items())
-    print(cookieString)
+
     return cookieString
 
 
 if __name__ == "__main__":
-    url = sys.argv[1]
-    dvwa_login(baseURL=url)
+    result = dvwa_login(base_url=URL)
+    print(f"\nFINAL RESULT: {result}")
