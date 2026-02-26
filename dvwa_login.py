@@ -2,6 +2,7 @@ import requests
 from dotenv import load_dotenv
 import os
 from bs4 import BeautifulSoup
+import sys
 
 load_dotenv()
 
@@ -39,4 +40,10 @@ def dvwa_login(baseURL: str):
     # get cookies
     cookies = session.cookies.get_dict()
     cookieString = "; ".join(f"{k}={v}" for k, v in cookies.items())
+    print(cookieString)
     return cookieString
+
+
+if __name__ == "__main__":
+    url = sys.argv[1]
+    dvwa_login(baseURL=url)
