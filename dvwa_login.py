@@ -1,10 +1,8 @@
 import requests
-from dotenv import load_dotenv
-import os
 from bs4 import BeautifulSoup
+import sys
 
-load_dotenv()
-URL = os.getenv(key="TEST_TARGET", default="http://192.168.157.136")
+# python dvwa_login.py xxx.xxx.xxx.xxx
 
 
 def dvwa_login(base_url: str):
@@ -38,5 +36,5 @@ def dvwa_login(base_url: str):
 
 
 if __name__ == "__main__":
-    result = dvwa_login(base_url=URL)
-    print(f"\nFINAL RESULT: {result}")
+    result = dvwa_login(base_url=sys.argv[1])
+    print(result)
